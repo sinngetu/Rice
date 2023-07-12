@@ -1,0 +1,20 @@
+{
+  "name": "rice",
+  "version": "0.0.1",
+  "description": "delicious",
+  "main": "index.ts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "dev": "ts-node index.ts --dev"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "puppeteer": "^20.8.1"
+  }
+}
