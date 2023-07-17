@@ -1,45 +1,79 @@
+import url from 'node:url'
+import { createHash } from 'node:crypto'
 import puppeteer, { PuppeteerLaunchOptions } from 'puppeteer'
+import dayjs from 'dayjs'
 
 import config from './config'
 import db from './db'
 import { New, RawNew } from './interface'
 
+import urls from './urls.json' assert { type: 'json' }
+import media from './media.json' assert { type: 'json' }
+
 (async () => {
     const option = config.DEV ? ({
         headless: false,
-        slowMo: 500
+        // slowMo: 500
     } as PuppeteerLaunchOptions) : undefined
 
     const browser = await puppeteer.launch(option)
     const page = await browser.newPage()
-
-    await page.goto('https://www.google.com.hk/search?q=jack+ma&newwindow=1&client=safari&rls=en&tbm=nws&sxsrf=AJOqlzXgtmlPkxSehN3BfBkZFGGoQXE2yA:1679397384384&source=lnt&tbs=qdr:h&sa=X&ved=2ahUKEwj-paHk8uz9AhX2S2wGHduQBqcQpwV6BAgBEBU&biw=1440&bih=789&dpr=2')
-
     config.DEV && await page.setViewport({ width: 1080, height: 1024 })
 
-    const data = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('#rso .SoaBEf')).map(el => {
-            const link = el.querySelector('a')?.href
-            const medium = el.querySelector('.NUnG9d span')?.innerHTML
-            const title = el.querySelector('.MBeuO')?.innerHTML
-            const date = el.querySelector('.rbYSKb span')?.innerHTML
+    const news: RawNew[][] = []
 
-            if (link === undefined || medium === undefined || title === undefined || date === undefined)
-                throw new Error('Page info capture failed!')
+    for(const url of urls) {
+        await page.goto(url)
 
-            return ({ link, medium, title, date } as RawNew)
-        })
-    })
+        news.push(await page.evaluate(() => {
+            let list = document.querySelectorAll('#rso .SoaBEf')
 
-    save(data)
+            return Array.from(list).map(el => {
+                const link = el.querySelector('a')?.href
+                const medium = el.querySelector('.NUnG9d span')?.innerHTML
+                const title = el.querySelector('.MBeuO')?.innerHTML
+                const date = el.querySelector('.rbYSKb span')?.innerHTML
 
-    await browser.close()
-})()
+                if (link === undefined || medium === undefined || title === undefined || date === undefined)
+                    throw new Error('Page info capture missing!')
 
-async function save(news: RawNew[]) {
-    const data: New[] = news.map(({ link, title, medium, date }) => ({ link, title, medium, date, tags: '', status: 0 }))
+                return ({ link, medium, title, date } as RawNew)
+            })
+        }))
+    }
 
     await db.connect()
+
+    let data = news.flat().map(({ link, title, medium, date }) => ({
+        link,
+        title,
+        medium,
+        date: getDate(date),
+        hash: md5(`${medium}-${title}`),
+        tags: '',
+        status: 0
+    } as New)).filter(({ link }) => {
+        const host = url.parse(link).host || ''
+
+        return media.reduce((result, medium) => result || host.includes(medium), false)
+    })
+
+    const existHash = ((await db.query(db.condition({
+        hash: data.reduce((result, item) => [...result, item.hash], ([] as string[]))
+    }))) as New[]).map(i => i.hash)
+
+    data = data.filter(({ hash }) => !existHash.includes(hash))
+
     await db.add(data)
     await db.close()
+    await browser.close()
+    process.exit(0)
+})()
+
+function md5(content: string) { return createHash('md5').update(content).digest('hex') }
+
+function getDate(info: string) {
+    const [_, num, unit] = /^([0-9]*)\s(.*)前$/.exec(info) || []
+
+    return dayjs().subtract(unit === '分钟' ? Number(num) : 0, 'minute').format('YYYY-MM-DD HH:mm:00')
 }

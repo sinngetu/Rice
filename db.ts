@@ -6,8 +6,23 @@ const connection = mysql.createConnection(config.db)
 
 function connect() { connection.connect() }
 function close() { connection.end() }
-async function query() {
-    const sql = 'SELECT * FROM `work_news`'
+
+interface Condition {
+    hash?: string | string[]
+    title?: string
+}
+
+function condition(condition: Condition) {
+    if (typeof condition.hash === 'string')
+        condition.hash = [condition.hash]
+
+    const hash = condition.hash?.map(hash => `hash=${mysql.escape(hash)}`).join(' OR ') || ''
+
+    return hash ? ` WHERE ${hash}` : ''
+}
+
+async function query(condition: string) {
+    const sql = 'SELECT * FROM `work_news`' + condition
 
     return new Promise((resolve, reject) => {
         connection.query(sql, (err, result) => {
@@ -31,4 +46,4 @@ function add(data: any) {
     })
 }
 
-export default { connect, close, query, add }
+export default { connect, close, condition, query, add }
