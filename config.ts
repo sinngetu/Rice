@@ -1,6 +1,14 @@
-const config = {
+export default {
     DEV: process.argv.includes('--dev'),
-    exportFile: 'data.json'
+    db: {
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'work',
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 0
+    }
 }
-
-export default config

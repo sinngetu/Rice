@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "module": "esnext",
+    "module": "ESNext",
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
     "removeComments": true,
     "preserveConstEnums": true,
@@ -20,6 +19,7 @@
     "node_modules"
   ],
   "ts-node": {
-    "esm": true
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   }
 }

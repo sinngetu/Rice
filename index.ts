@@ -1,7 +1,8 @@
-import { writeFileSync } from 'node:fs'
 import puppeteer, { PuppeteerLaunchOptions } from 'puppeteer'
 
-const config = require('./config')
+import config from './config'
+import db from './db'
+import { New, RawNew } from './interface'
 
 (async () => {
     const option = config.DEV ? ({
@@ -21,16 +22,24 @@ const config = require('./config')
             const link = el.querySelector('a')?.href
             const medium = el.querySelector('.NUnG9d span')?.innerHTML
             const title = el.querySelector('.MBeuO')?.innerHTML
-            const time = el.querySelector('.rbYSKb span')?.innerHTML
+            const date = el.querySelector('.rbYSKb span')?.innerHTML
 
-            if (link === undefined || medium === undefined || title === undefined || time === undefined)
+            if (link === undefined || medium === undefined || title === undefined || date === undefined)
                 throw new Error('Page info capture failed!')
 
-            return { link, medium, title, time }
+            return ({ link, medium, title, date } as RawNew)
         })
     })
 
-    writeFileSync(config.exportFile, JSON.stringify(data), 'utf8')
+    save(data)
 
     await browser.close()
 })()
+
+async function save(news: RawNew[]) {
+    const data: New[] = news.map(({ link, title, medium, date }) => ({ link, title, medium, date, tags: '', status: 0 }))
+
+    await db.connect()
+    await db.add(data)
+    await db.close()
+}
