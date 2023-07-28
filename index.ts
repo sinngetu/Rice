@@ -52,17 +52,29 @@ import media from './media.json' assert { type: 'json' }
         hash: md5(`${medium}-${title}`),
         tags: '',
         status: 0
-    } as New)).filter(({ link }) => {
-        const host = url.parse(link).host || ''
+    } as New))
 
-        return media.reduce((result, medium) => result || host.includes(medium), false)
+    data.forEach(item => {
+        const host = url.parse(item.link).host || ''
+
+        item.medium = media.reduce((result, medium) => host.includes(medium.domain) ? medium.name : result, '')
     })
+
+    data = data.filter(({ medium }) => !!medium)
 
     const existHash = ((await db.query(db.condition({
         hash: data.reduce((result, item) => [...result, item.hash], ([] as string[]))
     }))) as New[]).map(i => i.hash)
 
-    data = data.filter(({ hash }) => !existHash.includes(hash))
+    const markHash = new Set()
+
+    data = data.filter(({ hash }) => {
+        if (existHash.includes(hash)) return false
+        if (markHash.has(hash)) return false
+
+        markHash.add(hash)
+        return true
+    })
 
     await db.add(data)
     await db.close()
