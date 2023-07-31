@@ -9,6 +9,7 @@ import { New, RawNew } from './interface'
 
 import urls from './urls.json' assert { type: 'json' }
 import media from './media.json' assert { type: 'json' }
+import ignore from './ignore.json' assert { type: 'json' }
 
 (async () => {
     const option = config.DEV ? ({
@@ -56,8 +57,9 @@ import media from './media.json' assert { type: 'json' }
 
     data.forEach(item => {
         const host = url.parse(item.link).host || ''
+        const pass = ignore.reduce((result, ignore) => result || host.includes(ignore), false)
 
-        item.medium = media.reduce((result, medium) => host.includes(medium.domain) ? medium.name : result, '')
+        item.medium = pass ? '' : (media.reduce((result, medium) => host.includes(medium.domain) ? medium.name : result, ''))
     })
 
     data = data.filter(({ medium }) => !!medium)
