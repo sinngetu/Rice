@@ -19,7 +19,6 @@ import ignore from './ignore.json' assert { type: 'json' }
 
     const browser = await puppeteer.launch(option)
     const page = await browser.newPage()
-    config.DEV && await page.setViewport({ width: 1080, height: 1024 })
 
     const news: RawNew[][] = []
 
@@ -55,6 +54,7 @@ import ignore from './ignore.json' assert { type: 'json' }
         status: 0
     } as New))
 
+    // 媒体名统一
     data.forEach(item => {
         const host = url.parse(item.link).host || ''
         const pass = ignore.reduce((result, ignore) => result || host.includes(ignore), false)
@@ -62,6 +62,7 @@ import ignore from './ignore.json' assert { type: 'json' }
         item.medium = pass ? '' : (media.reduce((result, medium) => host.includes(medium.domain) ? medium.name : result, ''))
     })
 
+    // 剔除非清单媒体信息
     data = data.filter(({ medium }) => !!medium)
 
     const existHash = ((await db.query(db.condition({
@@ -70,6 +71,7 @@ import ignore from './ignore.json' assert { type: 'json' }
 
     const markHash = new Set()
 
+    // 剔除重复信息
     data = data.filter(({ hash }) => {
         if (existHash.includes(hash)) return false
         if (markHash.has(hash)) return false
@@ -77,6 +79,16 @@ import ignore from './ignore.json' assert { type: 'json' }
         markHash.add(hash)
         return true
     })
+
+    // 标题补全
+    await Promise.all(data.map(item => new Promise(async (resolve) => {
+        const page = await browser.newPage()
+
+        await page.goto(item.link, { timeout: 0 })
+        item.title = await page.evaluate(() => document.title)
+
+        resolve(undefined)
+    })))
 
     await db.add(data)
     await db.close()
