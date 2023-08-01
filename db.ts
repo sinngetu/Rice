@@ -2,7 +2,6 @@ import mysql from 'mysql2'
 import config from './config'
 
 const connection = mysql.createConnection(config.db)
-// const pool = mysql.createPool(config.db)
 
 function connect() { connection.connect() }
 function close() { connection.end() }
@@ -33,6 +32,8 @@ async function query(condition: string) {
 
 function add(data: any) {
     data = Array.isArray(data) ? data : [data]
+
+    if (data.length === 0) return Promise.resolve()
 
     const keys = Object.keys(data[0])
     const values = data.map((item: any) => `(${keys.map(key => mysql.escape(item[key])).join(',')})`).join(',')
