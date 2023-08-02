@@ -3,13 +3,19 @@ import url from 'node:url'
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { db, md5 } from '../function'
+import { getHash, deduplicate } from '../function'
 import { New } from '../interface'
-import { RawNew } from './interface'
 
 import urls from './urls.json' assert { type: 'json' }
 import media from './media.json' assert { type: 'json' }
 import ignore from './ignore.json' assert { type: 'json' }
+
+interface RawNew {
+    link: string
+    title: string
+    date: string
+    medium?: string
+}
 
 export default async function (browser: Browser) {
     const page = await browser.newPage()
@@ -24,30 +30,22 @@ export default async function (browser: Browser) {
 
             return Array.from(list).map(el => {
                 const link = el.querySelector('a')?.href
-                const medium = el.querySelector('.NUnG9d span')?.innerHTML
+                // const medium = el.querySelector('.NUnG9d span')?.innerHTML
                 const title = el.querySelector('.MBeuO')?.innerHTML
                 const date = el.querySelector('.rbYSKb span')?.innerHTML
 
-                if (link === undefined || medium === undefined || title === undefined || date === undefined)
+                if (link === undefined || title === undefined || date === undefined)
                     throw new Error('Page info capture missing!')
 
-                return ({ link, medium, title, date } as RawNew)
+                return ({ link, title, date } as RawNew)
             })
         }))
     }
 
-    let data = news.flat().map(({ link, title, medium, date }) => ({
-        link,
-        title,
-        medium,
-        date: getDate(date),
-        hash: md5(`${medium}-${title}`),
-        tags: '',
-        status: 0
-    } as New))
+    let rawData = news.flat()
 
     // 媒体名统一
-    data.forEach(item => {
+    rawData.forEach(item => {
         const host = url.parse(item.link).host || ''
         const pass = ignore.reduce((result, ignore) => result || host.includes(ignore), false)
 
@@ -55,22 +53,17 @@ export default async function (browser: Browser) {
     })
 
     // 剔除非清单媒体信息
-    data = data.filter(({ medium }) => !!medium)
+    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium }) => ({
+        link,
+        title,
+        medium,
+        date: getDate(date),
+        hash: getHash(medium as string, title),
+        tags: '',
+        status: 0
+    } as New))
 
-    const existHash = ((await db.query(db.condition({
-        hash: data.reduce((result, item) => [...result, item.hash], ([] as string[]))
-    }))) as New[]).map(i => i.hash)
-
-    const markHash = new Set()
-
-    // 剔除重复信息
-    data = data.filter(({ hash }) => {
-        if (existHash.includes(hash)) return false
-        if (markHash.has(hash)) return false
-
-        markHash.add(hash)
-        return true
-    })
+    data = await deduplicate(data)
 
     // 标题补全
     await Promise.all(data.map(item => new Promise(async (resolve) => {
