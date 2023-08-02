@@ -66,16 +66,16 @@ export default async function (browser: Browser) {
     data = await deduplicate(data)
 
     // 标题补全
-    await Promise.all(data.map(item => new Promise(async (resolve) => {
-        const page = await browser.newPage()
+    // await Promise.all(data.map(item => new Promise(async (resolve) => {
+    //     const page = await browser.newPage()
 
-        try {
-            await page.goto(item.link, { timeout: 0 })
-            item.title = await page.evaluate(() => document.title)
-        } catch(e) {}
+    //     try {
+    //         await page.goto(item.link, { timeout: 0 })
+    //         item.title = await page.evaluate(() => document.title)
+    //     } catch(e) {}
 
-        resolve(undefined)
-    })))
+    //     resolve(undefined)
+    // })))
 
     return data
 }
