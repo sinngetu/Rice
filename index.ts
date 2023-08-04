@@ -6,7 +6,7 @@ import handle from './handle'
 (async () => {
     await db.connect()
 
-    const browser = await puppeteer.launch({ headless: false })
+    const browser = await puppeteer.launch({ headless: false, defaultViewport: null })
     const data = await handle(browser)
 
     await db.add(data)

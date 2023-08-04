@@ -19,10 +19,13 @@ export default async function(browser: Browser) {
         const page = await browser.newPage()
         await page.goto(url, { timeout: 0 })
 
-        return await page.evaluate(() => (Array.from(document.querySelectorAll('div[data-component="headline"] a')) as HTMLLinkElement[]).map(a => ({
+        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('div[data-component="headline"] a')) as HTMLLinkElement[]).map(a => ({
             link: a.href,
             title: a.innerText
         })))
+
+        await page.close()
+        return data
     }))
 
     const dateRegexp = /^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/
