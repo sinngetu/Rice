@@ -8,7 +8,7 @@ import handle from './handle'
     const data = await handle(browser)
 
     await model.news.saveNews(data)
-    console.log(`\n\nadd ${data.length} records\n\n`)
+    console.log(`\nadd ${data.length} records\n`)
 
     await model.close()
     await browser.close()
