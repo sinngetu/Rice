@@ -3,22 +3,22 @@ import url from 'node:url'
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { getHash, deduplicate } from '../function'
+import { getHash, deduplicate, model } from '../utils'
 import { New } from '../interface'
 
 import urls from './urls.json' assert { type: 'json' }
-import media from './media.json' assert { type: 'json' }
 import ignore from './ignore.json' assert { type: 'json' }
 
 interface RawNew {
     link: string
     title: string
     date: string
-    medium?: string
+    medium?: number
 }
 
 export default async function (browser: Browser) {
     const page = await browser.newPage()
+    const media = await model.media.getMedia()
 
     const news: RawNew[][] = []
 
@@ -45,20 +45,20 @@ export default async function (browser: Browser) {
     let rawData = news.flat()
 
     // 媒体名统一
-    rawData.forEach(item => {
+    rawData.forEach(async item => {
         const host = url.parse(item.link).host || ''
         const pass = ignore.reduce((result, ignore) => result || host.includes(ignore), false)
 
-        item.medium = pass ? '' : (media.reduce((result, medium) => host.includes(medium.domain) ? medium.name : result, ''))
+        item.medium = pass ? 0 : (media.reduce((result, medium) => host.includes(medium.domain) ? medium.id : result, 0))
     })
-
+ 
     // 剔除非清单媒体信息
     let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium }) => ({
         link,
         title,
         medium,
         date: getDate(date),
-        hash: getHash(medium as string, title),
+        hash: getHash(medium as number, title),
         tags: '',
         status: 0
     } as New))

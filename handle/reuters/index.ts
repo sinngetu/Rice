@@ -2,7 +2,7 @@ import url from 'node:url'
 import { Browser, Page } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { getHash, deduplicate } from '../function'
+import { getHash, deduplicate, model } from '../utils'
 import { New } from '../interface'
 
 import urls from './urls.json' assert { type: 'json' }
@@ -12,9 +12,12 @@ interface RawNew {
     title: string
 }
 
-const medium = '路透社'
+const domain = 'reuters.com'
 
 export default async function(browser: Browser) {
+    const media = await model.media.getMedia()
+    const medium = media.reduce((result, medium) => domain === medium.domain ? medium.id : result, 0)
+
     /** only one page **/
     // const page = await browser.newPage()
     // const news: RawNew[][] = []
