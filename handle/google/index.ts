@@ -42,6 +42,8 @@ export default async function (browser: Browser) {
         }))
     }
 
+    await page.close()
+
     let rawData = news.flat()
 
     // 媒体名统一
