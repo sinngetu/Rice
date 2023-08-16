@@ -40,6 +40,8 @@ export default async function (browser: Browser) {
                 return ({ link, title, date } as RawNew)
             })
         }))
+
+        await new Promise(r => setTimeout(r, 500))
     }
 
     await page.close()
@@ -83,7 +85,8 @@ export default async function (browser: Browser) {
 }
 
 function getDate(info: string) {
-    const [_, num, unit] = /^([0-9]*)\s(.*)前$/.exec(info) || []
+    // const [_, num, unit] = /^([0-9]*)\s(.*)前$/.exec(info) || []
 
-    return dayjs().subtract(unit === '分钟' ? Number(num) : 0, 'minute').format('YYYY-MM-DD HH:mm:00')
+    // return dayjs().subtract(unit === '分钟' ? Number(num) : 0, 'minute').format('YYYY-MM-DD HH:mm:00')
+    return dayjs().format('YYYY-MM-DD HH:mm:00')
 }
