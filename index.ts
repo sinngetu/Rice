@@ -2,9 +2,10 @@ import puppeteer from 'puppeteer'
 
 import * as model from './model'
 import handle from './handle'
+import config from './config'
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: false, defaultViewport: null })
+    const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
     const data = await handle(browser)
 
     await model.news.saveNews(data)
