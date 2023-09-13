@@ -6,4 +6,5 @@ export interface New {
     date: string
     tags: string
     status: number
+    keyword: string
 }

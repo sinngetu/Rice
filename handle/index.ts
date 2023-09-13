@@ -4,13 +4,14 @@ import google from './google'
 import bloomberg from './bloomberg'
 import reuters from './reuters'
 
-export default async (browser: Browser) => [
-    await google(browser),
-    await bloomberg(browser),
-    await reuters(browser)
-].flat()
+const website = async (browser: Browser) => {
+    const data = [
+        await bloomberg(browser),
+        await reuters(browser),
+    ]
 
-// export default async (browser: Browser) => Promise.all([
-//     google(browser),
-//     bloomberg(browser)
-// ]).then(data => data.flat())
+    await browser.close()
+    return data.flat()
+}
+
+export default async (browser: Browser) => Promise.all([google(), website(browser)]).then(data => data.flat())

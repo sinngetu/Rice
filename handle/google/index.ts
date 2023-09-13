@@ -1,8 +1,9 @@
 import url from 'node:url'
 
-import { Browser } from 'puppeteer'
+import puppeteer, { Browser, Page } from 'puppeteer'
 import dayjs from 'dayjs'
 
+import config from '../../config'
 import { getHash, deduplicate, model } from '../utils'
 import { New } from '../interface'
 
@@ -13,19 +14,43 @@ interface RawNew {
     link: string
     title: string
     date: string
+    keyword: string
     medium?: number
 }
 
-export default async function (browser: Browser) {
-    const page = await browser.newPage()
+export default async function () {
     const media = await model.media.getMedia()
-
     const news: RawNew[][] = []
 
-    for(const url of urls) {
+    const getPage = await (async () => {
+        let browser: Browser
+        let page: Page
+
+        const max = 25
+        let counter = max
+        return async () => {
+            if(++counter > max) {
+                if (browser) {
+                    await browser.close()
+                    await new Promise(r => setTimeout(r, 1000))
+                }
+
+                browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
+                page = await browser.newPage()
+                counter = 0
+            }
+
+            return page
+        }
+    })()
+
+    let counter = 0
+    for(const item of urls) {
+        const { keyword, url } = item
+        const page = await getPage()
         await page.goto(url)
 
-        news.push(await page.evaluate(() => {
+        news.push((await page.evaluate(() => {
             let list = document.querySelectorAll('#rso .SoaBEf')
 
             return Array.from(list).map(el => {
@@ -37,14 +62,13 @@ export default async function (browser: Browser) {
                 if (link === undefined || title === undefined || date === undefined)
                     throw new Error('Page info capture missing!')
 
-                return ({ link, title, date } as RawNew)
+                return ({ link, title, date, keyword: '--' } as RawNew)
             })
-        }))
+        })).map(i => ({ ...i, keyword})))
 
+        counter++
         await new Promise(r => setTimeout(r, 500))
     }
-
-    await page.close()
 
     let rawData = news.flat()
 
@@ -57,14 +81,15 @@ export default async function (browser: Browser) {
     })
  
     // 剔除非清单媒体信息
-    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium }) => ({
+    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium, keyword }) => ({
         link,
         title,
         medium,
         date: getDate(date),
         hash: getHash(medium as number, title),
         tags: '',
-        status: 0
+        status: 0,
+        keyword,
     } as New))
 
     data = await deduplicate(data)

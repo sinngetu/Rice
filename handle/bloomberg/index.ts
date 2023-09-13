@@ -39,7 +39,8 @@ export default async function(browser: Browser) {
         hash: getHash(medium, title),
         date: dayjs().format('YYYY-MM-DD HH:mm:00'),
         tags: '',
-        status: 0
+        status: 0,
+        keyword: '--',
     }))
 
     return await deduplicate(data)

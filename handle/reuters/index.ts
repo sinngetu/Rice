@@ -23,7 +23,7 @@ export default async function(browser: Browser) {
     // const news: RawNew[][] = []
 
     // for (const url of urls) {
-    //     await page.goto(url, { timeout: 0 })
+    //     await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
 
     //     news.push(await page.evaluate(() => ([
     //         Array.from(document.querySelectorAll('h3[data-testid="Heading"] a')),
@@ -73,7 +73,8 @@ export default async function(browser: Browser) {
         hash: getHash(medium, title),
         date: dayjs().format('YYYY-MM-DD HH:mm:00'),
         tags: '',
-        status: 0
+        status: 0,
+        keyword: '--',
     }))
 
     return await deduplicate(data)
