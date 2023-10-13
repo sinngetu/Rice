@@ -2,16 +2,17 @@ import puppeteer from 'puppeteer'
 
 import * as model from './model'
 import handle from './handle'
-import config from './config'
+import daddy from './daddy'
 
 (async () => {
-    const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
-    const data = await handle(browser)
+    const news = await handle()
+    await model.news.saveNews(news)
+    console.log(`\nadd ${news.length} news`)
 
-    await model.news.saveNews(data)
-    console.log(`\nadd ${data.length} records\n`)
+    const daddyInfo = await daddy()
+    await model.daddy.saveInfo(daddyInfo)
+    console.log(`add ${daddyInfo.length} daddy info\n`)
 
     await model.close()
-    await browser.close()
     process.exit(0)
 })()

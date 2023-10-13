@@ -1,8 +1,10 @@
-import { Browser } from 'puppeteer'
+import puppeteer, { Browser } from 'puppeteer'
 
 import google from './google'
 import bloomberg from './bloomberg'
 import reuters from './reuters'
+
+import config from '../config'
 
 const website = async (browser: Browser) => {
     const data = [
@@ -14,4 +16,10 @@ const website = async (browser: Browser) => {
     return data.flat()
 }
 
-export default async (browser: Browser) => Promise.all([google(), website(browser)]).then(data => data.flat())
+export default async () => {
+    const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
+    const data = await Promise.all([google(), website(browser)]).then(data => data.flat())
+
+    await browser.close()
+    return data
+}
