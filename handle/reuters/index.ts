@@ -70,7 +70,7 @@ export default async function(browser: Browser) {
         link,
         title,
         medium,
-        hash: getHash(medium, title),
+        hash: getHash(medium, link),
         date: dayjs().format('YYYY-MM-DD HH:mm:00'),
         tags: '',
         status: 0,

@@ -86,7 +86,7 @@ export default async function () {
         title,
         medium,
         date: getDate(date),
-        hash: getHash(medium as number, title),
+        hash: getHash(medium as number, link),
         tags: '',
         status: 0,
         keyword,
