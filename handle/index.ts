@@ -1,8 +1,10 @@
 import puppeteer, { Browser } from 'puppeteer'
 
 import google from './google'
+
 import bloomberg from './bloomberg'
 import reuters from './reuters'
+import wsj from './wsj'
 
 import config from '../config'
 
@@ -10,6 +12,7 @@ const website = async (browser: Browser) => {
     const data = [
         await bloomberg(browser),
         await reuters(browser),
+        await wsj(browser),
     ]
 
     await browser.close()

@@ -23,7 +23,7 @@ export default async function(browser: Browser) {
         await page.goto(url, { timeout: 0 })
 
         const data = await page.evaluate(() => (Array.from(document.querySelectorAll('div[data-component="headline"] a')) as HTMLLinkElement[]).map(a => ({
-            link: a.href,
+            link: a.href.split('?')[0],
             title: a.innerText
         })))
 
