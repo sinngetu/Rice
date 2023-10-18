@@ -5,6 +5,7 @@ import google from './google'
 import bloomberg from './bloomberg'
 import reuters from './reuters'
 import wsj from './wsj'
+import ft from './ft'
 
 import config from '../config'
 
@@ -13,6 +14,7 @@ const website = async (browser: Browser) => {
         await bloomberg(browser),
         await reuters(browser),
         await wsj(browser),
+        await ft(browser),
     ]
 
     await browser.close()
