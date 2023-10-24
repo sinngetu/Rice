@@ -3,6 +3,7 @@ import puppeteer from 'puppeteer'
 import * as model from './model'
 import handle from './handle'
 import daddy from './daddy'
+import BigNews from './BigNews'
 
 (async () => {
     const news = await handle()
@@ -14,5 +15,6 @@ import daddy from './daddy'
     console.log(`add ${daddyInfo.length} daddy info\n`)
 
     await model.close()
+    BigNews(news)
     process.exit(0)
 })()
