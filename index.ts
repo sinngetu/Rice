@@ -1,5 +1,3 @@
-import puppeteer from 'puppeteer'
-
 import * as model from './model'
 import handle from './handle'
 import daddy from './daddy'
