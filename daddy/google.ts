@@ -29,7 +29,7 @@ export default async function (browser: Browser) {
 
     const data = info.flat().map(item => ({
         ...item,
-        state: 0,
+        type: 0,
         hash: getHash(item.link),
         date: dayjs().format('YYYY-MM-DD HH:mm:00')
     } as Record))

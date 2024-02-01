@@ -5,7 +5,7 @@ export interface Record {
     content: string
     link: string
     date: string
-    state: number
+    type: number
 }
 
 const table = () => db<Record>('work_daddy')

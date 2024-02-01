@@ -15,6 +15,7 @@ interface RawNew {
     title: string
     date: string
     keyword: string
+    status: number
     medium?: number
 }
 
@@ -46,7 +47,7 @@ export default async function () {
 
     let counter = 0
     for(const item of urls) {
-        const { keyword, url } = item
+        const { status, keyword, url } = item
         const page = await getPage()
         await page.goto(url)
 
@@ -64,7 +65,7 @@ export default async function () {
 
                 return ({ link, title, date, keyword: '--' } as RawNew)
             })
-        })).map(i => ({ ...i, keyword})))
+        })).map(i => ({ ...i, keyword, status})))
 
         counter++
         await new Promise(r => setTimeout(r, 500))
@@ -81,14 +82,14 @@ export default async function () {
     })
  
     // 剔除非清单媒体信息
-    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium, keyword }) => ({
+    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium, keyword, status }) => ({
         link,
         title,
         medium,
+        status,
         date: getDate(date),
         hash: getHash(medium as number, link),
         tags: '',
-        status: 0,
         keyword,
     } as New))
 
