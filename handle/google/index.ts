@@ -7,7 +7,6 @@ import config from '../../config'
 import { getHash, deduplicate, model } from '../utils'
 import { New } from '../interface'
 
-import urls from './urls.json' assert { type: 'json' }
 import ignore from './ignore.json' assert { type: 'json' }
 
 interface RawNew {
@@ -22,6 +21,9 @@ interface RawNew {
 export default async function () {
     const media = await model.media.getMedia()
     const news: RawNew[][] = []
+    const urls = (await model.keyword.getKeyword.All())
+        .filter(({ type }) => type === 3 || type === 4)
+        .map(({ type, word, extend }) => ({ status: type - 3, keyword: word, url: extend }))
 
     const getPage = await (async () => {
         let browser: Browser
@@ -49,7 +51,7 @@ export default async function () {
     for(const item of urls) {
         const { status, keyword, url } = item
         const page = await getPage()
-        await page.goto(url)
+        await page.goto(url!)
 
         news.push((await page.evaluate(() => {
             let list = document.querySelectorAll('#rso .SoaBEf')
