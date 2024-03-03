@@ -21,7 +21,6 @@ const website = async (browser: Browser) => {
         await football(browser)
     ]
 
-    await browser.close()
     return data.flat()
 }
 

@@ -17,3 +17,7 @@ export const getKeyword = {
 export async function addKeyword(word: string, type: number, extend?: string) {
     return await table().insert({ word, type, extend })
 }
+
+export async function editKeyword(id: number, word: string, extend: string) {
+    return table().where('id', id).update({ word, extend })
+}
