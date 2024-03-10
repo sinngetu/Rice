@@ -39,7 +39,7 @@ export default (link: string, getNews: () => RawNews[]) => async (browser: Brows
             hash: getHash(medium, link),
             date: dayjs().format('YYYY-MM-DD HH:mm:00'),
             tags: '',
-            status: 0,
+            status: 2,
             keyword: '--',
         }))
     } catch(e) { data = [] }
