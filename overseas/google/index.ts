@@ -4,12 +4,12 @@ import puppeteer, { Browser, Page } from 'puppeteer'
 import dayjs from 'dayjs'
 
 import config from '../../config'
-import { getHash, deduplicate, model } from '../utils'
-import { New } from '../interface'
+import { getHash, deduplicate, model } from '../../utils'
+import { News } from '../../interface'
 
 import ignore from './ignore.json' assert { type: 'json' }
 
-interface RawNew {
+interface RawNews {
     link: string
     title: string
     date: string
@@ -20,7 +20,7 @@ interface RawNew {
 
 export default async function () {
     const media = await model.media.getMedia()
-    const news: RawNew[][] = []
+    const news: RawNews[][] = []
     const urls = (await model.keyword.getKeyword.All())
         .filter(({ type }) => type === 3 || type === 4)
         .map(({ type, word, extend }) => ({ status: type - 3, keyword: word, url: extend }))
@@ -65,7 +65,7 @@ export default async function () {
                 if (link === undefined || title === undefined || date === undefined)
                     throw new Error('Page info capture missing!')
 
-                return ({ link, title, date, keyword: '--' } as RawNew)
+                return ({ link, title, date, keyword: '--' } as RawNews)
             })
         })).map(i => ({ ...i, keyword, status})))
 
@@ -93,7 +93,7 @@ export default async function () {
         hash: getHash(medium as number, link),
         tags: '',
         keyword,
-    } as New))
+    } as News))
 
     data = await deduplicate(data)
 

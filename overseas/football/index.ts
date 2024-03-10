@@ -1,7 +1,7 @@
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { deduplicate, getHash } from '../utils'
+import { deduplicate, getHash } from '../../utils'
 
 export default async function (browser: Browser) {
     const medium = 99998

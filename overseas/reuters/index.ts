@@ -2,12 +2,12 @@ import url from 'node:url'
 import { Browser, Page } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { getHash, deduplicate, model } from '../utils'
-import { New } from '../interface'
+import { getHash, deduplicate, model } from '../../utils'
+import { News } from '../../interface'
 
 import urls from './urls.json' assert { type: 'json' }
 
-interface RawNew {
+interface RawNews {
     link: string
     title: string
 }
@@ -20,7 +20,7 @@ export default async function(browser: Browser) {
 
     /** only one page **/
     // const page = await browser.newPage()
-    // const news: RawNew[][] = []
+    // const news: RawNews[][] = []
 
     // for (const url of urls) {
     //     await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
@@ -39,14 +39,14 @@ export default async function(browser: Browser) {
     /** multiple page **/
     // const pagesNum = 3
     // const taskList = [...urls]
-    // const news: RawNew[][] = []
+    // const news: RawNews[][] = []
 
     // await Promise.all(new Array(pagesNum).fill(undefined).map(() => new Promise(async resolve => task(await browser.newPage(), taskList, news, resolve))))
 
 
 
     /** open all pages **/
-    const news: RawNew[][] = await Promise.all(urls.map(async url => {
+    const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
 
         await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
@@ -66,7 +66,7 @@ export default async function(browser: Browser) {
 
 
 
-    let data: New[] = news.flat().map(({ link, title }) => ({
+    let data: News[] = news.flat().map(({ link, title }) => ({
         link,
         title,
         medium,
@@ -80,7 +80,7 @@ export default async function(browser: Browser) {
     return await deduplicate(data)
 }
 
-// async function task(page: Page, tasks: string[], container: RawNew[][], cb: (arg: any) => void) {
+// async function task(page: Page, tasks: string[], container: RawNews[][], cb: (arg: any) => void) {
 //     if (!tasks.length) return cb(await page.close())
 
 //     await page.goto((tasks.shift() as string), { timeout: 0 })

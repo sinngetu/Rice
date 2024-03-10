@@ -1,4 +1,4 @@
-export interface New {
+export interface News {
     link: string
     hash: string
     title: string

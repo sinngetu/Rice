@@ -1,12 +1,12 @@
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import { getHash, deduplicate, model } from '../utils'
-import { New } from '../interface'
+import { getHash, deduplicate, model } from '../../utils'
+import { News } from '../../interface'
 
 import urls from './urls.json' assert { type: 'json' }
 
-interface RawNew {
+interface RawNews {
     link: string
     title: string
 }
@@ -18,7 +18,7 @@ export default async function(browser: Browser) {
     const medium = media.reduce((result, medium) => domain === medium.domain ? medium.id : result, 0)
 
     /** open all pages **/
-    const news: RawNew[][] = await Promise.all(urls.map(async url => {
+    const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
 
         await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
@@ -32,7 +32,7 @@ export default async function(browser: Browser) {
         return data
     }))
 
-    let data: New[] = news.flat().map(({ link, title }) => ({
+    let data: News[] = news.flat().map(({ link, title }) => ({
         link,
         title,
         medium,
