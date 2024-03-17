@@ -31,7 +31,12 @@ export default async function () {
 
         const max = 25
         let counter = max
-        return async () => {
+        return async (close: boolean = false) => {
+            if(close) {
+                await browser.close()
+                return page
+            }
+
             if(++counter > max) {
                 if (browser) {
                     await browser.close()
@@ -109,6 +114,7 @@ export default async function () {
     //     resolve(undefined)
     // })))
 
+    await getPage(true)
     return data
 }
 
