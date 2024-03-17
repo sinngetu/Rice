@@ -14,3 +14,7 @@ export async function getMedia() {
 
     return media
 }
+
+export async function addMedia(name: string, domain: string) {
+    return await table().insert({ name, domain })
+}

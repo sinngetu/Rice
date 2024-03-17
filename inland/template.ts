@@ -1,16 +1,21 @@
 import url from 'node:url'
-import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
+import type { Browser, WaitForOptions } from 'puppeteer'
 
 import { getHash, deduplicate, model } from '../utils'
 import { News } from '../interface'
 
-interface RawNews {
+export interface RawNews {
     link: string
     title: string
+    allowLinkRepeta?: boolean
 }
 
-export default (link: string, getNews: () => RawNews[]) => async (browser: Browser) => {
+export default (
+    link: string,
+    getNews: () => RawNews[],
+    waitUntil: WaitForOptions['waitUntil'] = 'networkidle2',
+) => async (browser: Browser) => {
     const { host } = url.parse(link)
     let data: News[]
 
@@ -19,14 +24,14 @@ export default (link: string, getNews: () => RawNews[]) => async (browser: Brows
         const medium = media.reduce((result, medium) => host === medium.domain ? medium.id : result, 0)
         const page = await browser.newPage()
 
-        await page.goto(link, { timeout: 0, waitUntil: 'networkidle2' })
+        await page.goto(link, { timeout: 0, waitUntil })
 
         const mark = {} as { [link: string]: boolean }
         const news: RawNews[] = (await page.evaluate(getNews)).filter(item => {
             if (!item.title || !item.title.trim()) return false
-            if (mark[item.title]) return false
+            if (mark[item.link] && !item.allowLinkRepeta) return false
 
-            mark[item.title] = true
+            mark[item.link] = true
             return true
         })
 
