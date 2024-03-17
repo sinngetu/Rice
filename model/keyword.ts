@@ -12,6 +12,7 @@ const table = () => db<Record>('work_keyword')
 export const getKeyword = {
     All: async () => { return await table().select('*') },
     ById: async (id: number) => { return await table().select('*').where('id', id) },
+    ByType: async (type: number) => { return await table().select('*').where('type', type) },
 }
 
 export async function addKeyword(word: string, type: number, extend?: string) {

@@ -21,6 +21,7 @@ export default (
 
     try {
         const media = await model.media.getMedia()
+        const keywords = await model.keyword.getKeyword.ByType(5)
         const medium = media.reduce((result, medium) => host === medium.domain ? medium.id : result, 0)
         const page = await browser.newPage()
 
@@ -47,6 +48,8 @@ export default (
             status: 2,
             keyword: '--',
         }))
+
+        data = data.filter(({ title }) => keywords.reduce((result, item) => result || title.includes(item.word), false))
     } catch(e) { data = [] }
 
     return await deduplicate(data)
