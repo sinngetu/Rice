@@ -30,6 +30,26 @@ import mydrivers from './www.mydrivers.com'
 import donews from './www.donews.com'
 import chinanews from './www.chinanews.com'
 import zaobao from './www.zaobao.com'
+import caijing from './www.caijing.com.cn'
+import huxiu from './www.huxiu.com'
+import techsina from './tech.sina.com.cn'
+import techweb from './www.techweb.com.cn'
+import myzaker from './www.myzaker.com'
+import guancha from './www.guancha.cn'
+import szhgh from './m.szhgh.com'
+import huanqiu from './www.huanqiu.com'
+import pedaily from './www.pedaily.cn'
+import stcn from './www.stcn.com'
+import cnstock from './www.cnstock.com'
+import stockstar from './www.stockstar.com'
+import zjol from './m.zjol.com.cn'
+import hangzhou from './www.hangzhou.com.cn'
+import zjgov from './www.zj.gov.cn'
+import gov from './www.gov.cn'
+import bbtnews from './bbtnews.com.cn'
+import tmtpost from './www.tmtpost.com'
+import bianews from './www.bianews.com'
+import yicai from './www.yicai.com'
 
 const website = async (browser: Browser) => {
     const data = [
@@ -62,6 +82,26 @@ const website = async (browser: Browser) => {
         await donews(browser),
         await chinanews(browser),
         await zaobao(browser),
+        await caijing(browser),
+        await huxiu(browser),
+        await techsina(browser),
+        await techweb(browser),
+        await myzaker(browser),
+        await guancha(browser),
+        await szhgh(browser),
+        await huanqiu(browser),
+        await pedaily(browser),
+        await stcn(browser),
+        await cnstock(browser),
+        await stockstar(browser),
+        await zjol(browser),
+        await hangzhou(browser),
+        await zjgov(browser),
+        await gov(browser),
+        await bbtnews(browser),
+        await tmtpost(browser),
+        await bianews(browser),
+        await yicai(browser),
     ]
 
     return data.flat()

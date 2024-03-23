@@ -38,11 +38,11 @@ export default (
 
         await page.close()
 
-        data = news.flat().map(({ link, title }) => ({
+        data = news.flat().map(({ link, title, allowLinkRepeta }) => ({
             link,
             title: title.split('/n')[0],
             medium,
-            hash: getHash(medium, link),
+            hash: getHash(medium, link, allowLinkRepeta ? title : ''),
             date: dayjs().format('YYYY-MM-DD HH:mm:00'),
             tags: '',
             status: 2,
