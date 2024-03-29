@@ -20,4 +20,4 @@ export default template('https://www.techweb.com.cn/', () => {
         link: a.href,
         title: a.innerText
     }))
-})
+}, 'domcontentloaded')
