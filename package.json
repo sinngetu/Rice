@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "start": "ts-node index.ts",
+    "hotlist": "ts-node hotlist.ts",
     "dev": "ts-node index.ts --dev",
     "test": "set DEBUG=* & ts-node test.ts"
   },
