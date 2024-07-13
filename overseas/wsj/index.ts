@@ -28,7 +28,7 @@ export default async function(browser: Browser) {
         const data = await page.evaluate(() => {
             const isCN = window.location.host === 'cn.wsj.com'
             const CNQuery = '.WSJTheme--headline--unZqjb45 a'
-            const MainQuery = 'h3 a.css-1me4f21-HeadlineLink'
+            const MainQuery = 'h3 a.e1sf124z14'
 
             return (Array.from(document.querySelectorAll(isCN ? CNQuery : MainQuery)) as HTMLLinkElement[]).map(a => ({
                 isCN,
