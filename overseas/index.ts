@@ -7,6 +7,7 @@ import reuters from './reuters'
 import wsj from './wsj'
 import ft from './ft'
 import nytimes from './nytimes'
+import nikkei from './nikkei'
 import football from './football'
 
 import config from '../config'
@@ -18,6 +19,7 @@ const website = async (browser: Browser) => {
         await wsj(browser),
         await ft(browser),
         await nytimes(browser),
+        await nikkei(browser),
         await football(browser)
     ]
 
