@@ -56,7 +56,7 @@ export default async function () {
     for(const item of urls) {
         const { status, keyword, url } = item
         const page = await getPage()
-        await page.goto(url!)
+        await page.goto(url!, { waitUntil: 'networkidle2' })
 
         news.push((await page.evaluate(() => {
             let list = document.querySelectorAll('#rso .SoaBEf')

@@ -26,7 +26,7 @@ export default async function(browser: Browser) {
         const news: RawNews[][] = await Promise.all(urls.map(async url => {
             const page = await browser.newPage()
 
-            await page.goto(url, { timeout: 0 })
+            await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
 
             const data = await page.evaluate(() => {
                 const isCN = window.location.host === 'm.ftchinese.com'

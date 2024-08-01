@@ -20,11 +20,11 @@ export default async function(browser: Browser) {
 
     const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
-        await page.goto(url, { timeout: 0 })
+        await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
 
-        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('div[data-component="headline"] a')) as HTMLLinkElement[]).map(a => ({
+        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('#latest_news a.LineupContentArchive_storyLink__ARnQO')) as HTMLLinkElement[]).map(a => ({
             link: a.href.split('?')[0],
-            title: a.innerText
+            title: (a.getElementsByClassName('Headline_large__3__hG')[0] as HTMLDivElement)?.innerText
         })))
 
         await page.close()
