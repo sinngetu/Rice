@@ -5,17 +5,7 @@ import daddy from './daddy'
 // import BigNews from './BigNews'
 
 (async () => {
-    try {
-        const overseasNews = await overseas()
-        await model.news.saveNews(overseasNews)
-        console.log(`\nadd ${overseasNews.length} overseas news`)
-    } catch(e) {}
-
-    try {
-        const inlandNews = await inland()
-        await model.news.saveNews(inlandNews)
-        console.log(`\nadd ${inlandNews.length} inland news`)
-    } catch(e) {}
+    await overseas()
 
     try {
         const daddyInfo = await daddy()
