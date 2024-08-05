@@ -20,6 +20,8 @@ export default async function(browser: Browser) {
     const CNMedium = media.reduce((result, medium) => CNDomain === medium.domain ? medium.id : result, 0)
     const MainMedium = media.reduce((result, medium) => MainDomain === medium.domain ? medium.id : result, 0)
 
+    urls.push(`https://cn.wsj.com/zh-hans/news/archive/${dayjs().format('YYYY/MM/DD')}`)
+
     const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
 
