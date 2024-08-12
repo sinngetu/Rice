@@ -1,19 +1,19 @@
 import * as model from './model'
 import overseas from './overseas'
-import inland from './inland'
+// import inland from './inland'
 import daddy from './daddy'
-// import BigNews from './BigNews'
 
-(async () => {
-    await overseas()
+const MINUTE = 1000 * 60
 
+const run = async () => {
     try {
-        const daddyInfo = await daddy()
-        await model.daddy.saveInfo(daddyInfo)
-        console.log(`add ${daddyInfo.length} daddy info\n`)
-    } catch(e) {}
+        await overseas()
+        await daddy()
+    } catch(e) {
+        await model.close()
+        throw e
+    }
+}
 
-    await model.close()
-    // BigNews(news)
-    process.exit(0)
-})()
+run()
+setInterval(run, 15 * MINUTE)

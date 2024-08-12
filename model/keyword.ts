@@ -9,6 +9,15 @@ export interface Record {
 
 const table = () => db<Record>('work_keyword')
 
+export const TYPE = {
+    HOTLIST: 0,
+    OVERSEAS_TAG: 1,
+    OVERSEAS: 2,
+    GOOGLE: 3,
+    WANDA: 4,
+    INLAND: 5,
+}
+
 export const getKeyword = {
     All: async () => { return await table().select('*') },
     ById: async (id: number) => { return await table().select('*').where('id', id) },

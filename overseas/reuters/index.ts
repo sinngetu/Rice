@@ -59,7 +59,8 @@ export default async function(browser: Browser) {
             title: a.innerText
         })))
 
-        await page.close()
+        try { await page.close() }
+        catch (e) { console.log(e) }
         return data
     }))
 

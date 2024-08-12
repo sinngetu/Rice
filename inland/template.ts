@@ -21,7 +21,7 @@ export default (
 
     try {
         const media = await model.media.getMedia()
-        const keywords = await model.keyword.getKeyword.ByType(5)
+        const keywords = await model.keyword.getKeyword.ByType(model.keyword.TYPE.INLAND)
         const medium = media.reduce((result, medium) => host === medium.domain ? medium.id : result, 0)
         const page = await browser.newPage()
 

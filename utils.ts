@@ -19,3 +19,15 @@ export async function deduplicate(data: News[]) {
         return true
     })
 }
+
+export async function saveNews(data: News[], info: string = '') {
+    if (data.length === 0)
+        return console.log(`${info} no new addtions`)
+
+    try {
+        await model.news.saveNews(data)
+        console.log(`add ${data.length} ${info} news`)
+    } catch(e) {
+        console.log(`${info} news save error!`)
+    }
+}

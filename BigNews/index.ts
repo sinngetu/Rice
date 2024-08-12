@@ -1,18 +1,24 @@
 import { News } from '../interface'
-import send from './send'
+import * as model from '../model/'
+import { send } from './server'
 
-const overseeMedium = [1, 22, 23, 24, 25, 26, 27, 64]
-const overseeKeywords = ['马云', 'jack ma', '阿里', 'alibaba']
+let mediums: number[]
+let keywords: string[]
 
-export default function (news: News[]) {
+const domains = ['www.wsj.com', 'cn.wsj.com', 'nytimes.com']
+
+export default async function (news: News[]) {
+    if (!mediums) mediums = (await model.media.getMedia()).filter(medium => domains.includes(medium.domain)).map(medium => medium.id)
+    if (!keywords) keywords = (await model.keyword.getKeyword.ByType(model.keyword.TYPE.OVERSEAS)).map(record => record.word)
+
     const BigNews = news.filter(({ title, medium }) => {
         title = title.toLowerCase()
 
-        const isOverseeMedia = overseeMedium.includes(medium)
-        const hasOverseeKeyword = !isOverseeMedia || overseeKeywords.reduce((result, keyword) => result || title.includes(keyword), false)
+        const inMediumList = mediums.includes(medium)
+        const hasKeyword = keywords.reduce((result, keyword) => result || title.includes(keyword), false)
 
-        return isOverseeMedia && hasOverseeKeyword
+        return inMediumList || hasKeyword
     })
 
-    if (BigNews.length) send(JSON.stringify(BigNews))
+    if (BigNews.length) send(JSON.stringify(BigNews.map(({ link, title }) => ({ link, title }))))
 }
