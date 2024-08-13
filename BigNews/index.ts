@@ -1,5 +1,6 @@
 import { News } from '../interface'
 import * as model from '../model/'
+import { en2zh } from '../utils'
 import { send } from './server'
 
 let mediums: number[]
@@ -20,5 +21,10 @@ export default async function (news: News[]) {
         return inMediumList || hasKeyword
     })
 
-    if (BigNews.length) send(JSON.stringify(BigNews.map(({ link, title }) => ({ link, title }))))
+    if (BigNews.length) {
+        const enText = BigNews.map(({ title }) => title)
+        const zhText = (await en2zh(enText.join('\n'))).split('\n')
+
+        send(JSON.stringify(BigNews.map(({ link, title }, i) => ({ link, en: title, zh: zhText[i] }))))
+    }
 }

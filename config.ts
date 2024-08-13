@@ -5,5 +5,9 @@ export default {
         user: 'root',
         password: '',
         database: 'work'
+    },
+    youdao: {
+        id: '',
+        key: ''
     }
 }
