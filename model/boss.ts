@@ -8,7 +8,7 @@ export interface Record {
     type: number
 }
 
-const table = () => db<Record>('work_daddy')
+const table = () => db<Record>('work_boss')
 
 export async function saveInfo(data: Record[]) { return data.length ? await table().insert(data) : [] }
 

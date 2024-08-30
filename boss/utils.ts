@@ -6,7 +6,7 @@ export * as model from '../model'
 export function md5(content: string) { return createHash('md5').update(content).digest('hex') }
 export function getHash(url: string) { return md5(url) }
 export async function deduplicate(data: Record[]) {
-    const existHash = (await model.daddy.getInfo.ByHash(data.reduce((result, item) => result.concat(item.hash), ([] as string[]))) as Record[]).map(i => i.hash)
+    const existHash = (await model.boss.getInfo.ByHash(data.reduce((result, item) => result.concat(item.hash), ([] as string[]))) as Record[]).map(i => i.hash)
     const markHash = new Set()
 
     return data.filter(({ hash }) => {
