@@ -3,6 +3,7 @@ import zhihu from './zhihu'
 import douyin from './douyin'
 import baidu from './baidu'
 import toutiao from './toutiao'
+import netease from './netease'
 
 import * as model from '../model'
 import { HotItem } from './interface'
@@ -15,6 +16,7 @@ export default async () => {
         douyin(),
         baidu(),
         toutiao(),
+        netease(),
     ])).flat()
 
     const existHash = (await model.hotlist.getList.ByHash(data.reduce((result, item) => result.concat(item.hash), ([] as string[]))) as HotItem[]).map(i => i.hash)
