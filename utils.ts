@@ -33,6 +33,11 @@ export async function saveNews(data: News[], info: string = '') {
     }
 }
 
+function truncate(q: string) {
+    const len = q.length
+    return len <= 20 ? q : (q.substring(0, 10) + len + q.substring(len-10, len))
+}
+
 export async function en2zh(text: string) {
     const salt = (new Date).getTime()
     const curtime = Math.round(new Date().getTime() / 1000)
@@ -69,10 +74,7 @@ export async function en2zh(text: string) {
         return null
     }
 
-    return translation
-}
-
-function truncate(q: string) {
-    const len = q.length
-    return len <= 20 ? q : (q.substring(0, 10) + len + q.substring(len-10, len))
+    return translation && translation[0]
+        ? translation[0]
+        : null
 }

@@ -13,7 +13,7 @@ import football from './football'
 
 import config from '../config'
 import { saveNews } from '../utils'
-import BigNews from '../BigNews/'
+import BigNews from '../big-news'
 
 const website = async (browser: Browser) => {
     const _bloomberg = await bloomberg(browser)

@@ -1,5 +1,6 @@
 import { HotItem } from './interface'
 import { getHash, now } from '../utils'
+import { send, action } from '../local-socket'
 
 const id = 8
 let hashes: string[] = []
@@ -56,12 +57,10 @@ export default async function() {
 }
 
 export async function UpdateWeiboList() {
-    await fetch('http://localhost:6464/hotlist/weibo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            token: '000de90a486803219f0b59daa6e9a8a1',
-            data: hashes
-        })
+    const msg = JSON.stringify({
+        action: action.SetWeiboHotlist,
+        data: hashes
     })
+
+    send(msg)
 }

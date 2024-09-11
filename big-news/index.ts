@@ -1,7 +1,7 @@
 import { News } from '../interface'
-import * as model from '../model/'
+import * as model from '../model'
 import { en2zh } from '../utils'
-import { send } from './server'
+import { send, action } from '../local-socket/'
 
 let mediums: number[]
 let keywords: string[]
@@ -22,9 +22,17 @@ export default async function (news: News[]) {
     })
 
     if (BigNews.length) {
-        const enText = BigNews.map(({ title }) => title)
-        const zhText = (await en2zh(enText.join('\n'))).split('\n')
+        const title = BigNews.map(({ title }) => title)
+        const translation = (await en2zh(title.join('\n'))).split('\n')
+        const data = BigNews.map(({ link, title }, i) => ({ link, title, translation: translation[i] }));
 
-        send(JSON.stringify(BigNews.map(({ link, title }, i) => ({ link, en: title, zh: zhText[i] }))))
+        data.forEach(item => {
+            if (item.translation === item.title)
+                delete item.translation
+        })
+
+        const message = JSON.stringify({ action: action.BigNews, data })
+
+        send(message)
     }
 }

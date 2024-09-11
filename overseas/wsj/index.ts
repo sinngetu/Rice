@@ -22,26 +22,29 @@ export default async function(browser: Browser) {
 
     urls.push(`https://cn.wsj.com/zh-hans/news/archive/${dayjs().format('YYYY/MM/DD')}`)
 
-    const news: RawNews[][] = await Promise.all(urls.map(async url => {
-        const page = await browser.newPage()
-
-        await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
-
-        const data = await page.evaluate(() => {
-            const isCN = window.location.host === 'cn.wsj.com'
-            const CNQuery = '.WSJTheme--headline--unZqjb45 a'
-            const MainQuery = 'h3 a.e1sf124z14'
-
-            return (Array.from(document.querySelectorAll(isCN ? CNQuery : MainQuery)) as HTMLLinkElement[]).map(a => ({
-                isCN,
-                link: a.href.split('?')[0],
-                title: a.innerText
-            }))
-        })
-
-        await page.close()
-        return data
-    }))
+    let news: RawNews[][]
+    try {
+        news = await Promise.all(urls.map(async url => {
+            const page = await browser.newPage()
+    
+            await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
+    
+            const data = await page.evaluate(() => {
+                const isCN = window.location.host === 'cn.wsj.com'
+                const CNQuery = '.WSJTheme--headline--unZqjb45 a'
+                const MainQuery = 'h3 a.e1sf124z14'
+    
+                return (Array.from(document.querySelectorAll(isCN ? CNQuery : MainQuery)) as HTMLLinkElement[]).map(a => ({
+                    isCN,
+                    link: a.href.split('?')[0],
+                    title: a.innerText
+                }))
+            })
+    
+            await page.close()
+            return data
+        }))
+    } catch(e) { news = [] }
 
     let data: News[] = news.flat().map(({ isCN, link, title }) => ({
         link,

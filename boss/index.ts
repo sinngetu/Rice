@@ -5,7 +5,7 @@ import google from './google'
 
 import config from '../config'
 import * as model from '../model'
-import BigNews from '../BigNews'
+import BigNews from '../big-news'
 
 export default async () => {
     const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
