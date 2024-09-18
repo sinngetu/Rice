@@ -10,7 +10,7 @@ const domains = ['www.wsj.com', 'cn.wsj.com', 'nytimes.com']
 
 export default async function (news: News[]) {
     if (!mediums) mediums = (await model.media.getMedia()).filter(medium => domains.includes(medium.domain)).map(medium => medium.id)
-    if (!keywords) keywords = (await model.keyword.getKeyword.ByType(model.keyword.TYPE.OVERSEAS)).map(record => record.word)
+    if (!keywords) keywords = (await model.keyword.getKeyword.ByType(model.keyword.TYPE.OVERSEAS)).map(record => record.word.toLowerCase())
 
     const BigNews = news.filter(({ title, medium }) => {
         title = title.toLowerCase()
