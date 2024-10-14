@@ -56,7 +56,16 @@ export default async function () {
     for(const item of urls) {
         const { status, keyword, url } = item
         const page = await getPage()
-        await page.goto(url!, { waitUntil: 'networkidle2' })
+        let reloadTimes = config.PageReloadTimes
+
+        try {
+            await page.goto(url!, { timeout: 0, waitUntil: 'networkidle2' })
+        } catch(e) {
+            if(reloadTimes-- !== 0) {
+                await new Promise(r => setTimeout(r, 1000))
+                await page.reload({ timeout: 0, waitUntil: 'networkidle2' })
+            }
+        }
 
         news.push((await page.evaluate(() => {
             let list = document.querySelectorAll('#rso .SoaBEf')

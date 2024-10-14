@@ -2,6 +2,7 @@ import url from 'node:url'
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
+import config from '../../config'
 import { getHash, deduplicate, model } from '../../utils'
 import { News } from '../../interface'
 
@@ -20,11 +21,20 @@ export default async function(browser: Browser) {
 
     const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
-        await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+        let reloadTimes = config.PageReloadTimes
 
-        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('#latest_news a.LineupContentArchive_storyLink__ARnQO')) as HTMLLinkElement[]).map(a => ({
+        try {
+            await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+        } catch(e) {
+            if(reloadTimes-- !== 0) {
+                await new Promise(r => setTimeout(r, 1000))
+                await page.reload({ timeout: 0, waitUntil: 'networkidle2' })
+            }
+        }
+
+        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('#latest_news a.LineupContentArchive_storyLink__Umeq4')) as HTMLLinkElement[]).map(a => ({
             link: a.href.split('?')[0],
-            title: (a.getElementsByClassName('Headline_large__3__hG')[0] as HTMLDivElement)?.innerText
+            title: (a.getElementsByClassName('Headline_large__BPshg')[0] as HTMLDivElement)?.innerText
         })))
 
         await page.close()

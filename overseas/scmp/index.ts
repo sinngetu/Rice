@@ -1,6 +1,7 @@
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
+import config from '../../config'
 import { getHash, deduplicate, model } from '../../utils'
 import { News } from '../../interface'
 
@@ -22,8 +23,16 @@ export default async function(browser: Browser) {
 
         const news: RawNews[][] = await Promise.all(urls.map(async url => {
             const page = await browser.newPage()
+            let reloadTimes = config.PageReloadTimes
 
-            await page.goto(url, { timeout: 0 })
+            try {
+                await page.goto(url, { timeout: 0, waitUntil: 'networkidle2' })
+            } catch(e) {
+                if(reloadTimes-- !== 0) {
+                    await new Promise(r => setTimeout(r, 1000))
+                    await page.reload({ timeout: 0, waitUntil: 'networkidle2' })
+                }
+            }
 
             const data = await page.evaluate(() => {
                 const query = 'div[data-qa="ContentItemLivePrimary-Headline"]>a'

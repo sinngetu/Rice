@@ -53,12 +53,14 @@ const website = async (browser: Browser) => {
 }
 
 export default async () => {
-    const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
-
-    await Promise.all([
-        google().then(data => saveNews(data, 'google')),
-        website(browser).then(async data => await BigNews(data))
-    ])
-
-    await browser.close()
+    try {
+        const browser = await puppeteer.launch({ headless: !config.DEV, defaultViewport: null })
+    
+        await Promise.all([
+            google().then(data => saveNews(data, 'google')),
+            website(browser).then(async data => await BigNews(data))
+        ])
+    
+        await browser.close()
+    } catch (e) { console.error(e) }
 }

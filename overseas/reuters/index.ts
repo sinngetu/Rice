@@ -2,6 +2,7 @@ import url from 'node:url'
 import { Browser, Page } from 'puppeteer'
 import dayjs from 'dayjs'
 
+import config from '../../config'
 import { getHash, deduplicate, model } from '../../utils'
 import { News } from '../../interface'
 
@@ -48,8 +49,16 @@ export default async function(browser: Browser) {
     /** open all pages **/
     const news: RawNews[][] = await Promise.all(urls.map(async url => {
         const page = await browser.newPage()
+        let reloadTimes = config.PageReloadTimes
 
-        await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
+        try {
+            await page.goto(url, { timeout: 0, waitUntil: 'domcontentloaded' })
+        } catch(e) {
+            if(reloadTimes-- !== 0) {
+                await new Promise(r => setTimeout(r, 1000))
+                await page.reload({ timeout: 0, waitUntil: 'domcontentloaded' })
+            }
+        }
 
         const data = await page.evaluate(() => ([
             Array.from(document.querySelectorAll('h3[data-testid="Heading"] a')),
@@ -63,9 +72,6 @@ export default async function(browser: Browser) {
         catch (e) { console.log(e) }
         return data
     }))
-
-
-
 
     let data: News[] = news.flat().map(({ link, title }) => ({
         link,

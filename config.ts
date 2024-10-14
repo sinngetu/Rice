@@ -9,5 +9,6 @@ export default {
     youdao: {
         id: '',
         key: ''
-    }
+    },
+    PageReloadTimes: 10
 }
