@@ -3,6 +3,7 @@ import { getHash, now } from '../utils'
 import { send, action } from '../local-socket'
 
 const id = 8
+let raw: any[] = []
 let hashes: string[] = []
 
 export default async function() {
@@ -32,8 +33,7 @@ export default async function() {
             credentials: 'include'
         })
 
-        const raw = (await res.json()).data.realtime as any[]
-
+        raw = (await res.json()).data.realtime as any[]
         data = raw.filter((item, i) => (i !== 0 && raw[i - 1].rank === item.rank) ? false : true).map(item => ({
             hash: getHash(id, item.word),
             content: item.word,
@@ -59,7 +59,7 @@ export default async function() {
 export async function UpdateWeiboList() {
     const msg = JSON.stringify({
         action: action.SetWeiboHotlist,
-        data: hashes
+        data: { raw, hashes }
     })
 
     send(msg)
