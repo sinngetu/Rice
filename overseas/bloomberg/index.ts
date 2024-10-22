@@ -32,7 +32,7 @@ export default async function(browser: Browser) {
             }
         }
 
-        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('#latest_news a.LineupContentArchive_storyLink__Umeq4')) as HTMLLinkElement[]).map(a => ({
+        const data = await page.evaluate(() => (Array.from(document.querySelectorAll('#filter_latest a.LineupContentArchiveFiltered_storyLink__cz5Qc')) as HTMLLinkElement[]).map(a => ({
             link: a.href.split('?')[0],
             title: (a.getElementsByClassName('Headline_large__BPshg')[0] as HTMLDivElement)?.innerText
         })))
