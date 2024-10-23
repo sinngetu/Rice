@@ -9,6 +9,8 @@ import ft from './ft'
 import nytimes from './nytimes'
 import nikkei from './nikkei'
 import scmp from './scmp'
+import theinformation from './theinformation'
+import economist from './economist'
 import football from './football'
 
 import config from '../config'
@@ -37,6 +39,12 @@ const website = async (browser: Browser) => {
     const _scmp = await scmp(browser)
     await saveNews(_scmp, 'scmp')
 
+    const _theinformation = await theinformation(browser)
+    await saveNews(_theinformation, 'theinformation')
+
+    const _economist = await economist(browser)
+    await saveNews(_economist, 'economist')
+
     const _football = await football(browser)
     await saveNews(_football, 'football')
 
@@ -48,6 +56,8 @@ const website = async (browser: Browser) => {
         _nytimes,
         _nikkei,
         _scmp,
+        _theinformation,
+        _economist,
         _football
     ].flat().filter(data => !!data)
 }
