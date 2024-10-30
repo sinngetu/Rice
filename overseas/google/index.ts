@@ -19,7 +19,7 @@ interface RawNews {
 }
 
 export default async function () {
-    const media = await model.media.getMedia()
+    const media = (await model.media.getMedia()).filter(medium => medium.type === 0)
     const news: RawNews[][] = []
     const urls = (await model.keyword.getKeyword.All())
         .filter(({ type }) => type === 3 || type === 4)
@@ -98,16 +98,18 @@ export default async function () {
     })
  
     // 剔除非清单媒体信息
-    let data = rawData.filter(({ medium }) => !!medium).map(({ link, title, date, medium, keyword, status }) => ({
-        link,
-        title,
-        medium,
-        status,
-        date: getDate(date),
-        hash: getHash(medium as number, link),
-        tags: '',
-        keyword,
-    } as News))
+    let data = rawData
+        .filter(({ medium }) => !!medium)
+        .map(({ link, title, date, medium, keyword, status }) => ({
+            link,
+            title,
+            medium,
+            status,
+            date: getDate(date),
+            hash: getHash(medium as number, link),
+            tags: '',
+            keyword,
+        } as News))
 
     data = await deduplicate(data)
 

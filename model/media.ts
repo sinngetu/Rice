@@ -4,6 +4,7 @@ export interface Record {
     id: number
     name: string
     domain: string
+    type: number
 }
 
 const table = () => db<Record>('work_media')
