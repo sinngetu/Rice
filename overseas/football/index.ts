@@ -11,7 +11,7 @@ export default async function (browser: Browser) {
 
     try {
         reloadTimes = config.PageReloadTimes
-        await page.goto('https://www.thecfa.cn/gfgg/index.html', { timeout: 0, waitUntil: 'domcontentloaded' })
+        await page.goto('https://www.thecfa.cn/gfgg/index.html', { timeout: 15000, waitUntil: 'domcontentloaded' })
     } catch(e) {
         if(reloadTimes-- !== 0) {
             await new Promise(r => setTimeout(r, 1000))
