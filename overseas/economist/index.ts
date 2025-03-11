@@ -1,7 +1,6 @@
 import { Browser } from 'puppeteer'
 import dayjs from 'dayjs'
 
-import config from '../../config'
 import { getHash, deduplicate, model } from '../../utils'
 import { News } from '../../interface'
 
@@ -19,29 +18,19 @@ export default async function(browser: Browser) {
     const tomorrowURL = `https://www.economist.com/weeklyedition/${now.add(1, 'day').format('YYYY-MM-DD')}`
 
     const page = await browser.newPage()
-    let reloadTimes = config.PageReloadTimes
 
     try {
-        await page.goto(todayURL, { timeout: 0, waitUntil: 'domcontentloaded' })
-    } catch(e) {
-        if(reloadTimes-- !== 0) {
-            await new Promise(r => setTimeout(r, 1000))
-            await page.reload({ timeout: 0, waitUntil: 'domcontentloaded' })
-        }
-    }
+        await page.goto(todayURL, { timeout: 5000, waitUntil: 'networkidle2' })
+    } catch(e) {}
 
-    if (document.querySelector('img.ds-missed-target__illustration') !== null) {
+    let hasData = await page.evaluate(() => document.querySelector('img.ds-missed-target__illustration') === null)
+    if (!hasData) {
         try {
-            await page.goto(tomorrowURL, { timeout: 0, waitUntil: 'domcontentloaded' })
-        } catch(e) {
-            if(reloadTimes-- !== 0) {
-                await new Promise(r => setTimeout(r, 1000))
-                await page.reload({ timeout: 0, waitUntil: 'domcontentloaded' })
-            }
-        }
+            await page.goto(tomorrowURL, { timeout: 5000, waitUntil: 'networkidle2' })
+        } catch(e) {}
     }
 
-    const hasData = document.querySelector('img.ds-missed-target__illustration') === null
+    hasData = await page.evaluate(() => document.querySelector('img.ds-missed-target__illustration') === null)
     const news = hasData ? await page.evaluate(() => (Array.from(document.querySelectorAll('h3.e7j57mt0 a')) as HTMLLinkElement[]).map(a => ({
         link: a.href,
         title: a.innerText
