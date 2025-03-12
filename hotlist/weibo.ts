@@ -1,12 +1,20 @@
 import { HotItem } from './interface'
 import { getHash, now } from '../utils'
 import { send, action } from '../local-socket'
+import * as model from '../model'
+import { TYPE } from '../model/keyword'
 
 const id = 8
+const risingID = 14
 let raw: any[] = []
 let hashes: string[] = []
 
 export default async function() {
+    return await Promise.all([HotList(), RisingList()])
+        .then(results => results.flat())
+}
+
+async function HotList() {
     let data: HotItem[]
 
     try {
@@ -42,13 +50,61 @@ export default async function() {
             link: `https://s.weibo.com/weibo?q=${encodeURIComponent(item.word_scheme)}`
         } as HotItem))
 
-        hashes = data.map(item => item.hash).slice(0, 13)
+        hashes = data.map(item => item.hash)
     } catch(e) {
         data = [{
-            hash: getHash(id, `${now(id)} 微博这次没抓到`),
-            content: `${now(id)} 微博这次没抓到`,
+            hash: getHash(id, `${now(id)} 微博热搜这次没抓到`),
+            content: `${now(id)} 微博热搜这次没抓到`,
             platform: id,
             date: now(id),
+            link: 'https://weibo.com/ajax/side/hotSearch',
+        } as HotItem]
+    }
+
+    return data
+}
+
+async function RisingList() {
+    let data: HotItem[]
+
+    try {
+        const res = await fetch('https://www.entobit.cn/trending/top/getWeiboRank.do', {
+            headers: {
+                accept: 'application/json, text/plain, */*',
+                'accept-language': 'zh-CN,zh;q=0.9',
+                'content-type': 'application/x-www-form-urlencoded',
+                priority: 'u=1, i',
+                'sec-ch-ua': '\"Google Chrome\";v=\"129\", \"Not=A?Brand\";v=\"8\", \"Chromium\";v=\"129\"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '\"Windows\"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
+                type: 'restful',
+                Referer: 'https://www.entobit.cn/hot-search/desktop',
+                'Referrer-Policy': 'strict-origin-when-cross-origin'
+            },
+            body: 'type=realTimeHotSpots&accessToken=',
+            method: 'POST'
+        })
+
+        const keywords = (await model.keyword.getKeyword.ByType(TYPE.RISING)).map(record => record.word)
+
+        data = (await res.json() as any[])
+            .filter(item => keywords.reduce((r, keyword) => r || item.keywords.includes(keyword), false))
+            .map(item => ({
+                hash: getHash(risingID, item.keywords),
+                content: item.keywords,
+                platform: risingID,
+                date: now(risingID),
+                link: item.url
+            }))
+    } catch(e) {
+        data = [{
+            hash: getHash(risingID, `${now(risingID)} 微博上升榜这次没抓到`),
+            content: `${now(risingID)} 微博上升榜这次没抓到`,
+            platform: risingID,
+            date: now(risingID),
             link: 'https://weibo.com/ajax/side/hotSearch',
         } as HotItem]
     }

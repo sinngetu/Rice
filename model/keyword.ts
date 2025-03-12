@@ -16,6 +16,7 @@ export const TYPE = {
     GOOGLE: 3,
     WANDA: 4,
     INLAND: 5,
+    RISING: 6,
 }
 
 export const getKeyword = {
